@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" href="assets/img/symbol.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUITE/fonts/static/woff2/SUITE.css">
-  <link rel="stylesheet" href="assets/css/style.css?v=20261111a">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261111b">
 </head>
 <body>
 
@@ -20,14 +20,6 @@
         <a class="top-link" href="admin.html">관리자</a>
       </div>
     </div>
-    <nav class="gnb" aria-label="주요 메뉴">
-      <div class="wrap narrow">
-        <a href="./" data-nav="home">홈</a>
-        <a href="times.html" data-nav="times" aria-current="page">전체 타임 보기</a>
-        <a href="./#my" data-nav="my">내 신청 확인</a>
-        <a href="https://oneul.or.kr" data-nav="org" target="_blank" rel="noopener">사단법인 오늘은<span class="ext" aria-hidden="true">↗</span></a>
-      </div>
-    </nav>
   </header>
 
   <main class="wrap narrow">
@@ -42,9 +34,16 @@
 
   <footer><img src="assets/img/symbol.png" alt="" width="28" height="27"><div>운영 · <span data-setting="orgName">사단법인 오늘은</span></div><div class="en-label">TODAY TO TOMORROW</div></footer>
 
-  <script src="assets/js/config.js?v=20261111a"></script>
-  <script src="assets/js/api.js?v=20261111a"></script>
-  <script src="assets/js/common.js?v=20261111a"></script>
-  <script src="assets/js/times.js?v=20261111a"></script>
+  <nav class="tabbar" aria-label="주요 메뉴">
+    <a href="./" data-nav="home"><span class="tb-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.2 12 3.5l8.5 6.7V19a1.5 1.5 0 0 1-1.5 1.5h-4.2v-5.8H9.2v5.8H5A1.5 1.5 0 0 1 3.5 19z"/></svg></span><span class="tb-tx">홈</span></a>
+    <a href="times.html" data-nav="times" aria-current="page"><span class="tb-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.8h17M8 3v4M16 3v4"/><path d="M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 17h.01M12 17h.01" stroke-width="2.6"/></svg></span><span class="tb-tx">전체 타임</span></a>
+    <a href="./#my" data-nav="my"><span class="tb-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4.5" width="14" height="16" rx="2.5"/><path d="M9.5 4.5V3.2h5v1.3M9 12.5l2.1 2.1 3.9-4"/></svg></span><span class="tb-tx">내 신청</span></a>
+    <a href="https://oneul.or.kr" data-nav="org" target="_blank" rel="noopener"><span class="tb-ic"><img src="assets/img/symbol.png" alt="" width="22" height="22"></span><span class="tb-tx">오늘은</span></a>
+  </nav>
+
+  <script src="assets/js/config.js?v=20261111b"></script>
+  <script src="assets/js/api.js?v=20261111b"></script>
+  <script src="assets/js/common.js?v=20261111b"></script>
+  <script src="assets/js/times.js?v=20261111b"></script>
 </body>
 </html>

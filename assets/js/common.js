@@ -114,7 +114,7 @@
   // 상단 메뉴의 '사단법인 오늘은' 링크는 config.js 의 ORG_URL 을 따름
   (function () {
     var url = (window.APP_CONFIG || {}).ORG_URL;
-    var a = document.querySelector('.gnb [data-nav="org"]');
+    var a = document.querySelector('.tabbar [data-nav="org"]');
     if (a && url && /^https?:\/\//.test(url)) a.href = url;
   })();
 

@@ -354,19 +354,32 @@ footer img { width: 28px; height: auto; opacity: .85; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
 
-/* ───────────── 상단 카테고리 메뉴 ───────────── */
+/* ───────────── 하단 아이콘 탭바 ───────────── */
 .topbar-inner { height: 56px; }
-.gnb .wrap { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
-.gnb .wrap::-webkit-scrollbar { display: none; }
-.gnb a { flex: none; position: relative; padding: 10px 10px 11px; font-size: 14px; font-weight: 600; color: var(--ink-muted); text-decoration: none; white-space: nowrap; }
-.gnb a:first-child { padding-left: 0; }
-.gnb a:hover { color: var(--ink); }
-.gnb a[aria-current="page"] { color: var(--primary-blue); font-weight: 700; }
-.gnb a[aria-current="page"]::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; background: var(--primary-blue); }
-.gnb a:first-child[aria-current="page"]::after { left: 0; }
-.gnb a[data-nav="org"] { margin-left: auto; padding-right: 0; }
-.gnb .ext { font-size: 11px; margin-left: 3px; }
-@media (max-width: 380px) { .gnb a { padding-left: 7px; padding-right: 7px; font-size: 13.5px; } }
+.tabbar { position: fixed; z-index: 35; left: 50%; transform: translateX(-50%); bottom: calc(10px + env(safe-area-inset-bottom));
+  width: calc(100% - 24px); max-width: 440px; display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px;
+  background: rgba(255, 255, 255, .97); border: 1px solid var(--line-soft); border-radius: 22px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .08), 0 1px 3px rgba(0, 0, 0, .05); }
+.tabbar a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 3px; text-decoration: none; color: #8a8a8a; -webkit-tap-highlight-color: transparent; }
+.tb-ic { display: grid; place-items: center; width: 52px; height: 32px; border-radius: var(--radius-pill); transition: background .15s, color .15s; }
+.tb-ic svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tb-ic img { width: 22px; height: 22px; opacity: .55; transition: opacity .15s; }
+.tb-tx { font-size: 11.5px; font-weight: 600; line-height: 1.2; }
+.tabbar a:hover { color: var(--ink); }
+.tabbar a:hover img { opacity: .85; }
+.tabbar a[aria-current="page"] { color: var(--primary-blue); }
+.tabbar a[aria-current="page"] .tb-ic { background: #e6eef8; }
+.tabbar a[aria-current="page"] .tb-ic svg { fill: rgba(31, 101, 184, .14); }
+.tabbar a[aria-current="page"] .tb-tx { font-weight: 700; }
+/* 탭바가 있는 페이지: 아래 여백, 신청 바·알림 위치를 탭바 위로 */
+body:has(.tabbar) main { padding-bottom: 110px; }
+body:has(.tabbar) footer { padding-bottom: 110px; }
+body:has(.tabbar) .action-bar { bottom: calc(82px + env(safe-area-inset-bottom)); left: 50%; right: auto; transform: translateX(-50%);
+  width: calc(100% - 24px); max-width: 440px; padding: 8px 8px 8px 16px; border: 1px solid var(--line-soft); border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .08); }
+body:has(.tabbar) .action-bar .wrap { padding: 0; }
+body:has(.tabbar) main.wrap.narrow { padding-bottom: 180px; }
+body:has(.tabbar) .toast { bottom: calc(150px + env(safe-area-inset-bottom)); }
 
 /* ───────────── 전체 타임 보기 ───────────── */
 .page-head { margin: 22px 2px 16px; }
