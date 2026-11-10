@@ -7,7 +7,7 @@
  * ⚠️ 이 저장소는 공개(Public)입니다. 이 파일에는 웹앱 주소 외의 비밀번호·개인정보를 절대 넣지 마세요.
  */
 window.APP_CONFIG = {
-  API_URL: '',
+  API_URL: 'https://script.google.com/macros/s/AKfycbzw7B-Niqglf9eRtMlrMQZk0jH9I75YlocoFqreMArArKfO4hrH3thSyPJIA5cuyogMFw/exec',
 
   // 시트를 아직 못 불러왔을 때 잠깐 보이는 기본 문구 (실제 문구는 시트의 '설정' 탭에서 바꿉니다)
   SITE_NAME: 'connect 오늘',
