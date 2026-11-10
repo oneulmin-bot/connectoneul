@@ -400,3 +400,9 @@ body:has(.tabbar) .toast { bottom: calc(150px + env(safe-area-inset-bottom)); }
   text-decoration: none; font-size: 14px; font-weight: 600; transition: border-color .15s, background .15s; }
 .tl-mgr:hover { border-color: var(--primary-blue); background: #f2f6fb; }
 .avatar.xs { width: 26px; height: 26px; font-size: 12px; }
+
+/* 전체 타임: 상단바 없이 제목부터, 매니저 필터는 한 줄 가로 스크롤 */
+.page-head { margin-top: calc(28px + env(safe-area-inset-top)); }
+.filters-scroll { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px 14px; padding: 0 16px; }
+.filters-scroll::-webkit-scrollbar { display: none; }
+.filters-scroll .filter-chip { flex: none; }
