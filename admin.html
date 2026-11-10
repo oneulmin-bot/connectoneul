@@ -4,18 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
-  <title>관리자 · connect 오늘</title>
-  <meta name="theme-color" content="#ECE5F8">
+  <title>관리자 · 사단법인 오늘은</title>
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="assets/img/symbol.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUITE/fonts/static/woff2/SUITE.css">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <div class="bg-blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
   <header class="topbar">
     <div class="wrap narrow">
-      <div class="topbar-inner glass" style="width:100%">
-        <a class="brand" href="./"><span class="brand-mark">☕</span>connect <b>오늘</b></a>
+      <div class="topbar-inner">
+        <a class="brand" href="./" aria-label="사단법인 오늘은 커피챗 홈"><img src="assets/img/logo-oneuleun.png" alt="사단법인 오늘은" width="150" height="26"><span class="brand-sub">커피챗</span></a>
         <button type="button" class="top-link link-btn" id="logoutBtn" hidden style="text-decoration:none">로그아웃</button>
       </div>
     </div>
@@ -23,7 +24,7 @@
 
   <main class="wrap narrow">
     <!-- 로그인 -->
-    <section class="admin-login glass" id="loginView">
+    <section class="admin-login card" id="loginView">
       <h1>매니저 로그인</h1>
       <p>신청 내역 확인, 시간 관리, 소개 수정을 할 수 있어요.</p>
       <form id="loginForm" novalidate>
@@ -47,7 +48,7 @@
         <h1>커피챗 관리</h1>
         <span class="who" id="whoLabel"></span>
       </div>
-      <div class="tabs glass" role="tablist">
+      <div class="tabs" role="tablist">
         <button class="tab" role="tab" data-tab="apps" aria-selected="true">신청 내역<span class="n" id="pendingCount" hidden></span></button>
         <button class="tab" role="tab" data-tab="slots" aria-selected="false">시간 관리</button>
         <button class="tab" role="tab" data-tab="profile" aria-selected="false">매니저 소개</button>
@@ -68,7 +69,7 @@
 
       <!-- 시간 관리 -->
       <div data-panel="slots" hidden>
-        <div class="panel glass">
+        <div class="panel card">
           <h2>가능한 시간 추가</h2>
           <p class="hint">시작~종료 사이를 <span class="slotMin">30</span>분 단위로 나눠 한 번에 등록해요.</p>
           <form id="slotForm" novalidate>
@@ -88,7 +89,7 @@
             <button class="btn btn-primary btn-block" id="slotAddBtn">시간 추가</button>
           </form>
         </div>
-        <div class="panel glass">
+        <div class="panel card">
           <h2>등록된 시간</h2>
           <p class="hint">‘닫기’는 신청이 없는 시간만 가능해요. 신청이 들어온 시간은 신청 내역에서 처리해 주세요.</p>
           <div id="slotList"></div>
@@ -97,7 +98,7 @@
 
       <!-- 매니저 소개 -->
       <div data-panel="profile" hidden>
-        <div class="panel glass">
+        <div class="panel card">
           <div class="field">
             <label for="pfSelect">수정할 매니저</label>
             <select class="input select" id="pfSelect"></select>

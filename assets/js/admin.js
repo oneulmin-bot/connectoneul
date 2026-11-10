@@ -61,7 +61,7 @@
       renderSlots();
       fillProfile();
     }).catch(function (err) {
-      $('#appList').innerHTML = '<div class="state glass"><b>불러오지 못했어요</b>' + esc(err.message) + '</div>';
+      $('#appList').innerHTML = '<div class="state card"><b>불러오지 못했어요</b>' + esc(err.message) + '</div>';
     });
   }
 
@@ -101,7 +101,7 @@
       list.sort(function (a, b) { return (a.date + a.start).localeCompare(b.date + b.start); }); // 다가오는 순
     }
     if (!list.length) {
-      $('#appList').innerHTML = '<div class="state glass"><b>해당하는 신청이 없어요</b>' + (filter.status ? '‘' + esc(filter.status) + '’ 상태의 신청이 없습니다.' : '') + '</div>';
+      $('#appList').innerHTML = '<div class="state card"><b>해당하는 신청이 없어요</b>' + (filter.status ? '‘' + esc(filter.status) + '’ 상태의 신청이 없습니다.' : '') + '</div>';
       return;
     }
     $('#appList').innerHTML = list.map(function (a) {
@@ -113,7 +113,7 @@
       function btn(st, label, cls) { return '<button class="btn btn-sm ' + cls + '" data-act="status" data-status="' + st + '">' + label + '</button>'; }
 
       var tel = String(a.phone).replace(/\D/g, '');
-      return '<article class="app-card glass" data-id="' + esc(a.id) + '">' +
+      return '<article class="app-card card" data-id="' + esc(a.id) + '">' +
         '<div class="row"><div><div class="app-when">' + esc(U.fmtDate(a.date)) + ' ' + esc(a.start) + '</div>' +
         '<div class="app-mgr">' + esc(a.managerName || managerName(a.managerId)) + ' 매니저' + (a.past && a.status === '확정' ? ' · 시간 지남' : '') + '</div></div>' + U.badge(a.status) + '</div>' +
         '<div class="app-person"><b>' + esc(a.name) + '</b><a href="tel:' + esc(tel) + '">' + esc(a.phone) + '</a><a href="sms:' + esc(tel) + '">문자</a></div>' +
@@ -121,7 +121,7 @@
         '<div class="app-meta">신청 ' + esc(String(a.appliedAt).slice(0, 16)) + (a.handledBy ? ' · 처리 ' + esc(a.handledBy) + ' ' + esc(String(a.handledAt).slice(5, 16)) : '') + '</div>' +
         '<div class="app-actions">' + actions.join('') + '</div>' +
         '<div class="memo-row"><input class="input" maxlength="500" placeholder="메모 (예: 11/10 문자 발송 완료)" value="' + esc(a.memo) + '">' +
-        '<button class="btn btn-sm btn-glass" data-act="memo">저장</button></div>' +
+        '<button class="btn btn-sm btn-line" data-act="memo">저장</button></div>' +
       '</article>';
     }).join('');
   }

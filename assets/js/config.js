@@ -10,6 +10,6 @@ window.APP_CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbzw7B-Niqglf9eRtMlrMQZk0jH9I75YlocoFqreMArArKfO4hrH3thSyPJIA5cuyogMFw/exec',
 
   // 시트를 아직 못 불러왔을 때 잠깐 보이는 기본 문구 (실제 문구는 시트의 '설정' 탭에서 바꿉니다)
-  SITE_NAME: 'connect 오늘',
+  SITE_NAME: '사단법인 오늘은 커피챗',
   ORG_NAME: '사단법인 오늘은'
 };

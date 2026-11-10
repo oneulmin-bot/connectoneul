@@ -3,34 +3,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>connect 오늘 · 매니저 커피챗</title>
+  <title>사단법인 오늘은 · 매니저 커피챗</title>
   <meta name="description" content="매니저 소개를 보고 원하는 시간에 30분 커피챗을 신청하세요.">
-  <meta name="theme-color" content="#ECE5F8">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="assets/img/symbol.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUITE/fonts/static/woff2/SUITE.css">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <div class="bg-blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
   <header class="topbar">
     <div class="wrap">
-      <div class="topbar-inner glass" style="width:100%">
-        <a class="brand" href="./"><span class="brand-mark">☕</span>connect <b>오늘</b></a>
+      <div class="topbar-inner">
+        <a class="brand" href="./" aria-label="사단법인 오늘은 커피챗 홈"><img src="assets/img/logo-oneuleun.png" alt="사단법인 오늘은" width="150" height="26"><span class="brand-sub">커피챗</span></a>
         <a class="top-link" href="admin.html">관리자</a>
       </div>
     </div>
   </header>
 
   <main class="wrap">
-    <section class="hero glass">
-      <span class="eyebrow">☕ 30분 커피챗</span>
+    <section class="hero card">
+      <span class="motif" aria-hidden="true"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i><i class="m5"></i></span>
+      <span class="section-chip">사단법인 오늘은 <b>COFFEE CHAT</b></span>
       <h1>궁금했던 이야기,<br><em>매니저와 커피 한 잔</em>으로</h1>
       <p data-setting="intro">관심 있는 매니저를 골라 30분 커피챗을 신청해 보세요.</p>
       <div class="hero-meta">
-        <span class="chip">📍 <span data-setting="place">공덕역 인근 오프라인</span></span>
-        <span class="chip">⏱ 1회 30분</span>
+        <span class="chip"><b>장소</b><span data-setting="place">공덕역 인근 오프라인</span></span>
+        <span class="chip"><b>시간</b>1회 30분</span>
       </div>
-      <button type="button" class="btn btn-glass" id="openLookup">🔎 내 신청 확인하기</button>
+      <button type="button" class="btn btn-line" id="openLookup">내 신청 확인하기</button>
     </section>
 
     <div class="section-head">
@@ -42,11 +44,11 @@
     </div>
   </main>
 
-  <footer>운영 · <span data-setting="orgName">사단법인 오늘은</span></footer>
+  <footer><img src="assets/img/symbol.png" alt="" width="28" height="27"><div>운영 · <span data-setting="orgName">사단법인 오늘은</span></div><div class="en-label">TODAY TO TOMORROW</div></footer>
 
   <!-- 내 신청 확인 -->
   <div class="sheet-backdrop" id="lookupSheet" hidden role="dialog" aria-modal="true" aria-labelledby="lookupTitle">
-    <div class="sheet glass">
+    <div class="sheet card">
       <div class="sheet-grip"></div>
       <div class="sheet-head">
         <h2 id="lookupTitle">내 신청 확인</h2>

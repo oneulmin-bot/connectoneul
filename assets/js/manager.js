@@ -14,14 +14,14 @@
       state.manager = data.managers.filter(function (m) { return m.id === managerId; })[0] || null;
       state.slots = data.slots.filter(function (s) { return s.managerId === managerId; });
       if (!state.manager) {
-        $('#profile').innerHTML = '<div class="state"><b>매니저를 찾을 수 없어요</b>목록에서 다시 선택해 주세요.<br><br><a class="btn btn-glass btn-sm" href="./">매니저 목록</a></div>';
+        $('#profile').innerHTML = '<div class="state"><b>매니저를 찾을 수 없어요</b>목록에서 다시 선택해 주세요.<br><br><a class="btn btn-line btn-sm" href="./">매니저 목록</a></div>';
         return;
       }
-      document.title = state.manager.name + ' 매니저 커피챗 · connect 오늘';
+      document.title = state.manager.name + ' 매니저 커피챗 · 사단법인 오늘은';
       renderProfile();
       renderPicker();
     }).catch(function (err) {
-      $('#profile').innerHTML = '<div class="state"><b>정보를 불러오지 못했어요</b>' + esc(err.message) + '<br><br><button class="btn btn-glass btn-sm" onclick="location.reload()">다시 시도</button></div>';
+      $('#profile').innerHTML = '<div class="state"><b>정보를 불러오지 못했어요</b>' + esc(err.message) + '<br><br><button class="btn btn-line btn-sm" onclick="location.reload()">다시 시도</button></div>';
     });
   }
 

@@ -95,7 +95,8 @@
 
   function initial(name) { return esc(String(name || '?').trim().charAt(0)); }
   function avatar(m, cls) {
-    var c = 'avatar ' + (cls || '');
+    var code = String(m.name || '').charCodeAt(0) || 0;
+    var c = 'avatar av-' + (code % 4) + ' ' + (cls || '');
     if (m.photo && /^https:\/\//i.test(m.photo)) {
       return '<span class="' + c + '" data-initial="' + initial(m.name) + '"><img src="' + esc(m.photo) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></span>';
     }

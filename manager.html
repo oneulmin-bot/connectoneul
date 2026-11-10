@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>커피챗 신청 · connect 오늘</title>
-  <meta name="theme-color" content="#ECE5F8">
+  <title>커피챗 신청 · 사단법인 오늘은</title>
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="assets/img/symbol.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUITE/fonts/static/woff2/SUITE.css">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <div class="bg-blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
   <header class="topbar">
     <div class="wrap narrow">
-      <div class="topbar-inner glass" style="width:100%">
-        <a class="brand" href="./"><span class="brand-mark">☕</span>connect <b>오늘</b></a>
+      <div class="topbar-inner">
+        <a class="brand" href="./" aria-label="사단법인 오늘은 커피챗 홈"><img src="assets/img/logo-oneuleun.png" alt="사단법인 오늘은" width="150" height="26"><span class="brand-sub">커피챗</span></a>
         <a class="top-link" href="./#my">내 신청 확인</a>
       </div>
     </div>
@@ -25,19 +26,19 @@
 
     <!-- 신청 화면 -->
     <div id="bookView">
-      <section class="profile glass" id="profile"><div class="skeleton" style="min-height:120px;border:0"></div></section>
+      <section class="profile card" id="profile"><div class="skeleton" style="min-height:120px;border:0"></div></section>
 
-      <section class="picker glass" id="picker" hidden>
+      <section class="picker card" id="picker" hidden>
         <h2>날짜와 시간을 골라 주세요</h2>
         <p class="hint">한 타임 <span id="slotMin">30</span>분 · <span data-setting="place">공덕역 인근 오프라인</span></p>
         <div class="date-scroll" id="dates" role="group" aria-label="날짜 선택"></div>
         <div class="time-grid" id="times" role="group" aria-label="시간 선택"></div>
-        <div class="legend"><span><i style="background:#fff;border:1px solid rgba(31,101,184,.3)"></i>신청 가능</span><span><i style="background:#E6E9F0"></i>마감</span></div>
+        <div class="legend"><span><i style="background:#fff;border:1px solid #1f65b8"></i>신청 가능</span><span><i style="background:#e3e3e0"></i>마감</span></div>
       </section>
     </div>
 
     <!-- 완료 화면 -->
-    <section class="done glass" id="doneView" hidden>
+    <section class="done card" id="doneView" hidden>
       <div class="done-icon">✓</div>
       <h1>신청이 접수되었어요</h1>
       <p data-setting="doneMessage">매니저가 확인한 뒤 남겨주신 연락처로 확정 연락을 드립니다.</p>
@@ -48,7 +49,7 @@
       </div>
       <div class="btn-stack">
         <a class="btn btn-primary" href="./#my">내 신청 확인하기</a>
-        <a class="btn btn-glass" href="./">다른 매니저 보기</a>
+        <a class="btn btn-line" href="./">다른 매니저 보기</a>
       </div>
     </section>
   </main>
@@ -56,7 +57,7 @@
   <!-- 하단 신청 바 -->
   <div class="action-bar" id="actionBar" hidden>
     <div class="wrap">
-      <div class="action-inner glass">
+      <div class="action-inner">
         <div class="action-sel" id="actionSel">시간을 선택해 주세요<b>—</b></div>
         <button type="button" class="btn btn-primary" id="openApply" disabled>신청하기</button>
       </div>
@@ -65,7 +66,7 @@
 
   <!-- 신청서 -->
   <div class="sheet-backdrop" id="applySheet" hidden role="dialog" aria-modal="true" aria-labelledby="applyTitle">
-    <div class="sheet glass">
+    <div class="sheet card">
       <div class="sheet-grip"></div>
       <div class="sheet-head">
         <h2 id="applyTitle">커피챗 신청</h2>

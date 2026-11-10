@@ -1,8 +1,9 @@
-# connect 오늘 · 매니저 커피챗 신청
+# 사단법인 오늘은 커피챗 · 매니저 커피챗 신청
 
 참여자가 매니저 소개를 보고, 매니저가 열어 둔 30분 시간 중 하나를 골라 커피챗을 신청하는 홈페이지입니다.
 최종 확정은 매니저가 직접 연락합니다.
 
+- 디자인: 「오늘은 BRAND DESIGN」 디자인 시스템 (로고, 색, SUITE·SUIT 글꼴)
 - 화면: 순수 HTML/CSS/JS (빌드 도구 없음) → GitHub Pages
 - 데이터: 비공개 구글시트
 - 연결: Google Apps Script 웹앱 (`apps-script/Code.gs`)
@@ -19,7 +20,8 @@
 ## 파일 구조
 ```
 index.html / manager.html / admin.html
-assets/css/style.css     글래스모피즘 디자인 (SUIT, 포인트 #1F65B8)
+assets/css/style.css     오늘은 디자인 가이드 기반 스타일
+assets/img/              오늘은 로고·심볼
 assets/js/config.js      ★ 웹앱 URL 설정 (비우면 데모 모드)
 assets/js/api.js         서버 통신 + 데모 서버
 assets/js/common.js      공통 도구

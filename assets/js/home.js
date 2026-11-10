@@ -10,13 +10,13 @@
     data.slots.forEach(function (s) { if (s.available) counts[s.managerId] = (counts[s.managerId] || 0) + 1; });
 
     if (!data.managers.length) {
-      grid.innerHTML = '<div class="state glass" style="grid-column:1/-1"><b>곧 매니저가 소개될 예정이에요</b>조금만 기다려 주세요.</div>';
+      grid.innerHTML = '<div class="state card" style="grid-column:1/-1"><b>곧 매니저가 소개될 예정이에요</b>조금만 기다려 주세요.</div>';
       return;
     }
     $('#managerCount').textContent = data.managers.length + '명';
     grid.innerHTML = data.managers.map(function (m) {
       var n = counts[m.id] || 0;
-      return '<a class="manager-card glass" href="manager.html?id=' + encodeURIComponent(m.id) + '">' +
+      return '<a class="manager-card card" href="manager.html?id=' + encodeURIComponent(m.id) + '">' +
         '<div class="mc-top">' + U.avatar(m) +
           '<div><div class="mc-name">' + esc(m.name) + '<small>매니저</small></div>' +
           '<div class="mc-line">' + esc(m.oneLine) + '</div></div></div>' +
@@ -31,8 +31,8 @@
     U.applySettings(data.settings);
     renderManagers(data);
   }).catch(function (err) {
-    $('#managerGrid').innerHTML = '<div class="state glass" style="grid-column:1/-1"><b>매니저 정보를 불러오지 못했어요</b>' + esc(err.message) +
-      '<br><br><button class="btn btn-glass btn-sm" onclick="location.reload()">다시 시도</button></div>';
+    $('#managerGrid').innerHTML = '<div class="state card" style="grid-column:1/-1"><b>매니저 정보를 불러오지 못했어요</b>' + esc(err.message) +
+      '<br><br><button class="btn btn-line btn-sm" onclick="location.reload()">다시 시도</button></div>';
   });
 
   // ── 내 신청 확인 ──
