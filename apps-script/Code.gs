@@ -28,7 +28,7 @@ var SHEET = {
 };
 
 var HEADERS = {
-  '매니저': ['매니저ID', '이름', '한줄소개', '상세소개', '주제', '사진URL', '노출여부', '정렬순서'],
+  '매니저': ['매니저ID', '이름', '한줄소개', '상세소개', '주제', '사진URL', '노출여부', '정렬순서', '이메일'],
   '가능시간': ['슬롯ID', '매니저ID', '날짜', '시작', '종료', '상태', '등록시각'],
   '신청': ['신청ID', '신청시각', '슬롯ID', '매니저ID', '매니저이름', '날짜', '시작', '종료',
           '이름', '연락처', '하고싶은이야기', '확인번호(암호화)', '동의시각', '상태', '매니저메모', '처리시각', '처리자'],
@@ -42,7 +42,10 @@ var DEFAULT_SETTINGS = [
   ['소개문구', '관심 있는 매니저를 골라 30분 커피챗을 신청해 보세요.', '첫 화면 상단 안내 문구'],
   ['완료안내', '신청이 접수되었습니다. 매니저가 확인한 뒤 남겨주신 연락처로 확정 연락을 드립니다.', '신청 완료 화면 문구'],
   ['개인정보보유기간', '커피챗 종료 후 6개월', '개인정보 동의 문구의 보유 기간'],
-  ['신청받기', 'Y', 'N으로 바꾸면 전체 신청이 잠시 중단됩니다']
+  ['신청받기', 'Y', 'N으로 바꾸면 전체 신청이 잠시 중단됩니다'],
+  ['신청알림메일', 'Y', 'Y면 신청이 들어올 때 담당 매니저에게 메일을 보냅니다'],
+  ['운영자메일', '', '매니저 이메일이 비어 있을 때(예: 기타) 대신 받을 주소. 여러 명은 쉼표로 구분'],
+  ['홈페이지주소', 'https://oneulmin-bot.github.io/connectoneul/', '알림 메일 속 관리자 페이지 링크에 쓰입니다']
 ];
 
 // 신청 상태 / 슬롯 상태
@@ -55,7 +58,18 @@ function onOpen() {
     .createMenu('☕ 커피챗 관리')
     .addItem('1. 시트 자동 세팅', 'setupSheets')
     .addItem('2. 관리자 비밀번호 설정', 'setAdminPassword')
+    .addItem('3. 알림 메일 테스트 (나에게 보내기)', 'testMail')
     .addToUi();
+}
+
+/** 메일 보내기 권한을 승인하고, 내 메일로 예시 알림을 보냅니다. */
+function testMail() {
+  var me = Session.getActiveUser().getEmail() || Session.getEffectiveUser().getEmail();
+  sendMail_(me, {
+    managerName: '테스트', date: nowStr_().slice(0, 10), start: '14:00', end: '14:30',
+    name: '홍길동', phone: '010-0000-0000', message: '알림 메일 테스트입니다.', appId: 'TEST'
+  });
+  safeAlert_(me + ' 로 테스트 메일을 보냈습니다. 메일함(스팸함 포함)을 확인해 주세요.\n남은 하루 발송 가능 수: ' + MailApp.getRemainingDailyQuota());
 }
 
 /** 탭과 열 이름을 자동으로 만듭니다. 이미 있는 데이터는 지우지 않습니다. */
@@ -70,10 +84,11 @@ function setupSheets() {
     // 날짜·시간·연락처가 숫자/날짜로 바뀌지 않도록 저장할 때 텍스트로 고정합니다 (asText_ 참고)
   });
 
-  var setting = ss.getSheetByName(SHEET.SETTING);
-  if (setting.getLastRow() < 2) {
-    setting.getRange(2, 1, DEFAULT_SETTINGS.length, 3).setValues(DEFAULT_SETTINGS);
-  }
+  // 설정 탭: 없는 항목만 아래에 추가 (이미 바꾼 값은 그대로 둠)
+  var have = getSettings_();
+  DEFAULT_SETTINGS.forEach(function (row) {
+    if (!have.hasOwnProperty(row[0])) appendObj_(SHEET.SETTING, { '항목': row[0], '값': row[1], '설명': row[2] });
+  });
 
   var manager = ss.getSheetByName(SHEET.MANAGER);
   if (manager.getLastRow() < 2) {
@@ -232,10 +247,69 @@ function apply_(b) {
     setCell_(slotTable, row, '상태', SLOT_STATUS.HOLD);
     log_('신청자', '신청', appId, slot.date + ' ' + slot.start + ' / ' + str_(mRow['이름']));
 
-    return ok_({ id: appId, managerName: str_(mRow['이름']), date: slot.date, start: slot.start, end: slot.end });
+    var mail = {
+      to: str_(mRow['이메일']), managerName: str_(mRow['이름']), date: slot.date, start: slot.start, end: slot.end,
+      name: name, phone: phone, message: message, appId: appId
+    };
   } finally {
     lock.releaseLock();
   }
+
+  // 잠금을 푼 뒤 메일 발송 (메일이 실패해도 신청은 이미 저장됨)
+  notifyManager_(mail, settings);
+  return ok_({ id: appId, managerName: mail.managerName, date: mail.date, start: mail.start, end: mail.end });
+}
+
+// ───────────────────────── 신청 알림 메일 ─────────────────────────
+function notifyManager_(info, settings) {
+  try {
+    if (!isYes_(settings['신청알림메일'] || 'Y')) return;
+    var to = validEmails_(info.to) || validEmails_(settings['운영자메일']);
+    if (!to) { log_('시스템', '메일생략', info.appId, '받을 이메일이 없음 (매니저 이메일 또는 운영자메일 입력 필요)'); return; }
+    sendMail_(to, info, settings['홈페이지주소']);
+    log_('시스템', '메일발송', info.appId, info.managerName + ' 매니저에게 알림');
+  } catch (e) {
+    console.error(e);
+    log_('시스템', '메일실패', info.appId, String(e && e.message || e).slice(0, 200));
+  }
+}
+
+function sendMail_(to, info, siteUrl) {
+  var e = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+  var admin = (/^https:\/\//.test(siteUrl || '') ? String(siteUrl).replace(/\/?$/, '/') : '') + 'admin.html';
+  var when = info.date + ' ' + info.start + '–' + info.end;
+  var row = function (k, v) {
+    return '<tr><td style="padding:8px 12px;color:#555;white-space:nowrap;border-bottom:1px solid #eee">' + k +
+           '</td><td style="padding:8px 12px;border-bottom:1px solid #eee">' + v + '</td></tr>';
+  };
+  var html =
+    '<div style="font-family:Apple SD Gothic Neo,Malgun Gothic,sans-serif;max-width:520px;color:#000;line-height:1.6">' +
+    '<p style="font-size:13px;color:#1f65b8;font-weight:700;margin:0 0 4px">사단법인 오늘은 커피챗</p>' +
+    '<h2 style="font-size:20px;margin:0 0 12px">' + e(info.managerName) + ' 매니저님, 새 커피챗 신청이 들어왔어요</h2>' +
+    '<table style="border-collapse:collapse;width:100%;font-size:14px;margin-bottom:16px">' +
+      row('일시', '<b>' + e(when) + '</b>') +
+      row('신청자', e(info.name)) +
+      row('연락처', '<a href="tel:' + e(String(info.phone).replace(/\D/g, '')) + '">' + e(info.phone) + '</a>') +
+      row('나누고 싶은 이야기', e(info.message || '-').replace(/\n/g, '<br>')) +
+      row('신청번호', e(info.appId)) +
+    '</table>' +
+    '<p style="font-size:14px;margin:0 0 16px">신청자에게 직접 연락하신 뒤, 관리자 페이지에서 <b>[확정하기]</b>를 눌러 주세요.<br>' +
+    '어려운 경우 <b>[거절·취소]</b>를 누르면 그 시간이 다시 열립니다.</p>' +
+    (admin !== 'admin.html' ? '<p><a href="' + e(admin) + '" style="display:inline-block;background:#1f65b8;color:#fff;text-decoration:none;padding:10px 18px;border-radius:999px;font-weight:700">관리자 페이지 열기</a></p>' : '') +
+    '<p style="font-size:12px;color:#777;margin-top:20px">이 메일에는 신청자 개인정보가 들어 있습니다. 커피챗 목적 외에는 쓰지 말고, 전달하지 말아 주세요.</p>' +
+    '</div>';
+  MailApp.sendEmail({
+    to: to,
+    subject: '[오늘은 커피챗] 새 신청 · ' + when + ' · ' + info.name,
+    htmlBody: html,
+    body: info.managerName + ' 매니저님, 새 커피챗 신청: ' + when + ' / ' + info.name + ' / ' + info.phone + (admin !== 'admin.html' ? '\n관리자: ' + admin : ''),
+    name: '사단법인 오늘은 커피챗'
+  });
+}
+
+/** 쉼표로 구분된 주소 중 형식이 맞는 것만 남깁니다. 없으면 빈 문자열. */
+function validEmails_(v) {
+  return String(v || '').split(/[,;\s]+/).filter(function (x) { return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x); }).join(',');
 }
 
 // ───────────────────────── 내 신청 확인 ─────────────────────────
@@ -312,6 +386,7 @@ function adminData_() {
       var p = publicManager_(m);
       p.photo = str_(m['사진URL']);
       p.visible = isYes_(m['노출여부']);
+      p.email = str_(m['이메일']);   // 관리자 화면에서만 반환 (공개 조회에는 없음)
       return p;
     })
     .sort(byOrder_);
@@ -449,6 +524,9 @@ function adminSaveManager_(b, who) {
   if (!name) return fail_('이름을 입력해 주세요.');
   var photo = String(m.photo || '').trim();
   if (photo && !/^https:\/\//i.test(photo)) return fail_('사진 주소는 https:// 로 시작해야 합니다.');
+  var email = String(m.email || '').trim();
+  var badEmail = email.split(/[,;\s]+/).filter(String).some(function (x) { return !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x); });
+  if (badEmail) return fail_('이메일 형식을 확인해 주세요. (여러 개는 쉼표로 구분)');
 
   var values = {
     '이름': name,
@@ -457,13 +535,17 @@ function adminSaveManager_(b, who) {
     '주제': splitTopics_(m.topics).join(','),
     '사진URL': photo.slice(0, 500),
     '노출여부': m.visible ? 'Y' : 'N',
-    '정렬순서': String(Number(m.order) || 999)
+    '정렬순서': String(Number(m.order) || 999),
+    '이메일': validEmails_(email).slice(0, 200)
   };
 
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(15000)) return fail_('잠시 후 다시 시도해 주세요.');
   try {
     var table = readTable_(SHEET.MANAGER);
+    if (table.headers.indexOf('이메일') < 0) {
+      return fail_('시트에 \'이메일\' 열이 없습니다. 시트 메뉴 [☕ 커피챗 관리] > [1. 시트 자동 세팅]을 한 번 더 실행해 주세요.');
+    }
     var id = String(m.id || '');
     if (id) {
       var row = find_(table.rows, '매니저ID', id);

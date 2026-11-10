@@ -222,7 +222,7 @@
     var id = $('#pfSelect').value;
     var m = data.managers.filter(function (x) { return x.id === id; })[0] || { name: '', oneLine: '', detail: '', topics: [], photo: '', visible: false, order: data.managers.length + 1 };
     $('#pfName').value = m.name; $('#pfOne').value = m.oneLine; $('#pfDetail').value = m.detail;
-    $('#pfTopics').value = (m.topics || []).join(', '); $('#pfPhoto').value = m.photo || '';
+    $('#pfTopics').value = (m.topics || []).join(', '); $('#pfPhoto').value = m.photo || ''; $('#pfEmail').value = m.email || '';
     $('#pfOrder').value = m.order === 999 ? '' : m.order; $('#pfVisible').checked = !!m.visible;
   }
   $('#pfSelect').addEventListener('change', fillProfile);
@@ -234,7 +234,7 @@
       id: id === '__new' ? '' : id,
       name: $('#pfName').value.trim(), oneLine: $('#pfOne').value.trim(), detail: $('#pfDetail').value.trim(),
       topics: $('#pfTopics').value.split(/[,，]/).map(function (t) { return t.replace(/^#/, '').trim(); }).filter(Boolean),
-      photo: $('#pfPhoto').value.trim(), order: $('#pfOrder').value, visible: $('#pfVisible').checked
+      photo: $('#pfPhoto').value.trim(), email: $('#pfEmail').value.trim(), order: $('#pfOrder').value, visible: $('#pfVisible').checked
     };
     if (!manager.name) { U.toast('이름을 입력해 주세요.', 'error'); return; }
     var btn = $('#pfSaveBtn');

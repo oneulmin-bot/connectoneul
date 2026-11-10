@@ -195,7 +195,7 @@
           if (!auth(db, p)) return fail('로그인이 만료되었습니다.', 'AUTH');
           var mm = p.manager || {}; if (!String(mm.name || '').trim()) return fail('이름을 입력해 주세요.');
           if (mm.photo && !/^https:\/\//i.test(mm.photo)) return fail('사진 주소는 https:// 로 시작해야 합니다.');
-          var vals = { name: mm.name.trim(), oneLine: mm.oneLine || '', detail: mm.detail || '', topics: mm.topics || [], photo: mm.photo || '', visible: !!mm.visible, order: Number(mm.order) || 999 };
+          var vals = { email: mm.email || '', name: mm.name.trim(), oneLine: mm.oneLine || '', detail: mm.detail || '', topics: mm.topics || [], photo: mm.photo || '', visible: !!mm.visible, order: Number(mm.order) || 999 };
           if (mm.id) { Object.assign(find(db.managers, mm.id), vals); r = mm.id; }
           else { r = 'M' + pad(db.managers.length + 1); vals.id = r; db.managers.push(vals); }
           save(db); return ok({ id: r });
