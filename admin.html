@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>관리자 · connect 오늘</title>
+  <meta name="theme-color" content="#ECE5F8">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+  <header class="topbar">
+    <div class="wrap narrow">
+      <div class="topbar-inner glass" style="width:100%">
+        <a class="brand" href="./"><span class="brand-mark">☕</span>connect <b>오늘</b></a>
+        <button type="button" class="top-link link-btn" id="logoutBtn" hidden style="text-decoration:none">로그아웃</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap narrow">
+    <!-- 로그인 -->
+    <section class="admin-login glass" id="loginView">
+      <h1>매니저 로그인</h1>
+      <p>신청 내역 확인, 시간 관리, 소개 수정을 할 수 있어요.</p>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="who">처리자</label>
+          <select class="input select" id="who"><option value="운영자">운영자</option></select>
+          <p class="field-help">처리 기록에 남는 이름이에요.</p>
+        </div>
+        <div class="field">
+          <label for="pw">비밀번호</label>
+          <input class="input" id="pw" type="password" autocomplete="current-password">
+          <p class="field-error"></p>
+        </div>
+        <button class="btn btn-primary btn-block" id="loginBtn">로그인</button>
+      </form>
+    </section>
+
+    <!-- 관리 화면 -->
+    <section id="adminView" hidden>
+      <div class="admin-head">
+        <h1>커피챗 관리</h1>
+        <span class="who" id="whoLabel"></span>
+      </div>
+      <div class="tabs glass" role="tablist">
+        <button class="tab" role="tab" data-tab="apps" aria-selected="true">신청 내역<span class="n" id="pendingCount" hidden></span></button>
+        <button class="tab" role="tab" data-tab="slots" aria-selected="false">시간 관리</button>
+        <button class="tab" role="tab" data-tab="profile" aria-selected="false">매니저 소개</button>
+      </div>
+
+      <!-- 신청 내역 -->
+      <div data-panel="apps">
+        <div class="filters" id="statusFilters">
+          <button class="filter-chip" data-status="" aria-pressed="false">전체</button>
+          <button class="filter-chip" data-status="확인중" aria-pressed="true">확인중</button>
+          <button class="filter-chip" data-status="확정" aria-pressed="false">확정</button>
+          <button class="filter-chip" data-status="종료" aria-pressed="false">종료</button>
+          <button class="filter-chip" data-status="취소" aria-pressed="false">취소</button>
+          <select class="input select" id="appManager" aria-label="매니저 필터"><option value="">모든 매니저</option></select>
+        </div>
+        <div class="app-list" id="appList"></div>
+      </div>
+
+      <!-- 시간 관리 -->
+      <div data-panel="slots" hidden>
+        <div class="panel glass">
+          <h2>가능한 시간 추가</h2>
+          <p class="hint">시작~종료 사이를 <span class="slotMin">30</span>분 단위로 나눠 한 번에 등록해요.</p>
+          <form id="slotForm" novalidate>
+            <div class="field">
+              <label for="slotManager">매니저</label>
+              <select class="input select slot-manager" id="slotManager"></select>
+            </div>
+            <div class="field">
+              <label for="slotDate">날짜</label>
+              <input class="input" id="slotDate" type="date">
+            </div>
+            <div class="row-2">
+              <div class="field"><label for="slotStart">시작</label><select class="input select" id="slotStart"></select></div>
+              <div class="field"><label for="slotEnd">종료</label><select class="input select" id="slotEnd"></select></div>
+            </div>
+            <p class="preview-line" id="slotPreview"></p>
+            <button class="btn btn-primary btn-block" id="slotAddBtn">시간 추가</button>
+          </form>
+        </div>
+        <div class="panel glass">
+          <h2>등록된 시간</h2>
+          <p class="hint">‘닫기’는 신청이 없는 시간만 가능해요. 신청이 들어온 시간은 신청 내역에서 처리해 주세요.</p>
+          <div id="slotList"></div>
+        </div>
+      </div>
+
+      <!-- 매니저 소개 -->
+      <div data-panel="profile" hidden>
+        <div class="panel glass">
+          <div class="field">
+            <label for="pfSelect">수정할 매니저</label>
+            <select class="input select" id="pfSelect"></select>
+          </div>
+          <form id="profileForm" novalidate>
+            <div class="field"><label for="pfName">이름</label><input class="input" id="pfName" maxlength="30"></div>
+            <div class="field"><label for="pfOne">한 줄 소개</label><input class="input" id="pfOne" maxlength="60" placeholder="예) 비영리 10년차, 기획과 운영 이야기를 나눠요"></div>
+            <div class="field"><label for="pfDetail">상세 소개 <span class="opt">(선택)</span></label><textarea class="input" id="pfDetail" maxlength="1000" placeholder="어떤 이야기를 나눌 수 있는지 소개해 주세요."></textarea></div>
+            <div class="field"><label for="pfTopics">커피챗 주제</label><input class="input" id="pfTopics" placeholder="쉼표로 구분: 진로, 기획, 창업"><p class="field-help">최대 8개</p></div>
+            <div class="field"><label for="pfPhoto">사진 주소 <span class="opt">(선택)</span></label><input class="input" id="pfPhoto" placeholder="https://..."><p class="field-help">https:// 로 시작하는 이미지 주소. 비우면 이름 첫 글자가 표시돼요.</p></div>
+            <div class="row-2">
+              <div class="field"><label for="pfOrder">표시 순서</label><input class="input" id="pfOrder" type="number" min="1" max="999"></div>
+              <div class="field"><label>&nbsp;</label><label class="switch"><input type="checkbox" id="pfVisible"> 홈페이지에 노출</label></div>
+            </div>
+            <button class="btn btn-primary btn-block" id="pfSaveBtn">저장하기</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
