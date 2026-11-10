@@ -43,6 +43,9 @@
 
   $('#openLookup').addEventListener('click', function () { U.openSheet('lookupSheet'); });
   if (location.hash === '#my') U.openSheet('lookupSheet');
+  // 홈에서 상단 '내 신청 확인'을 누르면 페이지 이동 없이 바로 열기
+  var navMy = document.querySelector('.gnb [data-nav="my"]');
+  if (navMy) navMy.addEventListener('click', function (e) { e.preventDefault(); U.openSheet('lookupSheet'); });
 
   $('#lookupAgain').addEventListener('click', function () {
     $('#lookupResult').hidden = true; form.hidden = false; pin.value = ''; pin.focus();

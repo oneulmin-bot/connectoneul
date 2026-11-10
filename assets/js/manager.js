@@ -18,8 +18,18 @@
         return;
       }
       document.title = state.manager.name + ' 매니저 커피챗 · 사단법인 오늘은';
+      // 전체 타임 보기에서 특정 시간을 눌러 들어온 경우 그 시간을 미리 선택
+      var want = new URLSearchParams(location.search).get('slot');
+      if (want && !state.preselected) {
+        state.preselected = true;
+        var hit = state.slots.filter(function (s) { return s.id === want && s.available; })[0];
+        if (hit) { state.date = hit.date; state.slot = hit; }
+        else U.toast('선택한 시간이 방금 마감되었어요. 다른 시간을 골라 주세요.', 'error');
+      }
       renderProfile();
       renderPicker();
+      updateBar();
+      if (state.slot) setTimeout(function () { $('#picker').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200);
     }).catch(function (err) {
       $('#profile').innerHTML = '<div class="state"><b>정보를 불러오지 못했어요</b>' + esc(err.message) + '<br><br><button class="btn btn-line btn-sm" onclick="location.reload()">다시 시도</button></div>';
     });

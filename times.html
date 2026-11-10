@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>전체 타임 보기 · 사단법인 오늘은 커피챗</title>
+  <meta name="description" content="매니저들이 열어 둔 커피챗 가능 시간을 한눈에 보고 바로 신청하세요.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="assets/img/symbol.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUITE/fonts/static/woff2/SUITE.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="wrap narrow">
+      <div class="topbar-inner">
+        <a class="brand" href="./" aria-label="사단법인 오늘은 커피챗 홈"><img src="assets/img/logo-oneuleun.png" alt="사단법인 오늘은" width="150" height="26"><span class="brand-sub">커피챗</span></a>
+        <a class="top-link" href="admin.html">관리자</a>
+      </div>
+    </div>
+    <nav class="gnb" aria-label="주요 메뉴">
+      <div class="wrap narrow">
+        <a href="./" data-nav="home">홈</a>
+        <a href="times.html" data-nav="times" aria-current="page">전체 타임 보기</a>
+        <a href="./#my" data-nav="my">내 신청 확인</a>
+        <a href="https://oneul.or.kr" data-nav="org" target="_blank" rel="noopener">사단법인 오늘은<span class="ext" aria-hidden="true">↗</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="wrap narrow">
+    <div class="page-head">
+      <h1>전체 타임 보기</h1>
+      <p>매니저들이 열어 둔 시간을 날짜별로 모았어요. 원하는 시간의 매니저를 누르면 바로 신청할 수 있어요.</p>
+    </div>
+
+    <div class="filters" id="managerFilter" role="group" aria-label="매니저 선택"></div>
+    <div id="timeline" aria-live="polite"><div class="skeleton"></div></div>
+  </main>
+
+  <footer><img src="assets/img/symbol.png" alt="" width="28" height="27"><div>운영 · <span data-setting="orgName">사단법인 오늘은</span></div><div class="en-label">TODAY TO TOMORROW</div></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/times.js"></script>
+</body>
+</html>
