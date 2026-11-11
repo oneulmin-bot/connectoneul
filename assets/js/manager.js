@@ -120,7 +120,7 @@
   });
 
   // ── 신청서 ──
-  var name = $('#apName'), phone = $('#apPhone'), pin = $('#apPin'), msg = $('#apMsg'), agree = $('#apAgree');
+  var name = $('#apName'), phone = $('#apPhone'), email = $('#apEmail'), pin = $('#apPin'), msg = $('#apMsg'), agree = $('#apAgree');
   U.bindPhoneInput(phone);
   U.bindDigits(pin, 4);
   agree.addEventListener('change', function () { if (agree.checked) $('#agreeError').textContent = ''; });
@@ -129,6 +129,7 @@
     e.preventDefault();
     U.setError(name, U.validName(name.value) ? '' : '이름을 2~20자로 입력해 주세요.');
     U.setError(phone, U.validPhone(phone.value) ? '' : '연락처를 010-0000-0000 형식으로 입력해 주세요.');
+    U.setError(email, /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim()) ? '' : '이메일 주소를 확인해 주세요. (예: name@example.com)');
     U.setError(pin, U.validPin(pin.value) ? '' : '숫자 4자리를 입력해 주세요.');
     $('#agreeError').textContent = agree.checked ? '' : '개인정보 수집·이용 동의가 필요합니다.';
     var firstErr = document.querySelector('#applyForm .has-error .input');
@@ -138,9 +139,10 @@
     var btn = $('#applyBtn');
     var slot = state.slot;
     U.setBusy(btn, true, '신청 중');
-    API.call('apply', { slotId: slot.id, name: name.value.trim(), phone: phone.value, pin: pin.value, message: msg.value.trim(), agree: true })
+    API.call('apply', { slotId: slot.id, name: name.value.trim(), phone: phone.value, email: email.value.trim(), pin: pin.value, message: msg.value.trim(), agree: true })
       .then(function (r) {
         U.closeSheet('applySheet');
+        $('#doneEmail').textContent = '(' + email.value.trim() + ')';
         $('#doneSummary').innerHTML = summaryHtml(state.manager, { date: r.date, start: r.start, end: r.end });
         $('#bookView').hidden = true;
         $('#actionBar').hidden = true;

@@ -116,7 +116,8 @@
       return '<article class="app-card card" data-id="' + esc(a.id) + '">' +
         '<div class="row"><div><div class="app-when">' + esc(U.fmtDate(a.date)) + ' ' + esc(a.start) + '</div>' +
         '<div class="app-mgr">' + esc(a.managerName || managerName(a.managerId)) + ' 매니저' + (a.past && a.status === '확정' ? ' · 시간 지남' : '') + '</div></div>' + U.badge(a.status) + '</div>' +
-        '<div class="app-person"><b>' + esc(a.name) + '</b><a href="tel:' + esc(tel) + '">' + esc(a.phone) + '</a><a href="sms:' + esc(tel) + '">문자</a></div>' +
+        '<div class="app-person"><b>' + esc(a.name) + '</b><a href="tel:' + esc(tel) + '">' + esc(a.phone) + '</a><a href="sms:' + esc(tel) + '">문자</a>' +
+        (a.email ? '<a href="mailto:' + esc(a.email) + '">' + esc(a.email) + '</a>' : '') + '</div>' +
         (a.message ? '<p class="app-msg">💬 ' + esc(a.message) + '</p>' : '') +
         '<div class="app-meta">신청 ' + esc(String(a.appliedAt).slice(0, 16)) + (a.handledBy ? ' · 처리 ' + esc(a.handledBy) + ' ' + esc(String(a.handledAt).slice(5, 16)) : '') + '</div>' +
         '<div class="app-actions">' + actions.join('') + '</div>' +

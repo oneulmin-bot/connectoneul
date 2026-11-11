@@ -31,7 +31,7 @@ var HEADERS = {
   '매니저': ['매니저ID', '이름', '한줄소개', '상세소개', '주제', '사진URL', '노출여부', '정렬순서', '이메일'],
   '가능시간': ['슬롯ID', '매니저ID', '날짜', '시작', '종료', '상태', '등록시각'],
   '신청': ['신청ID', '신청시각', '슬롯ID', '매니저ID', '매니저이름', '날짜', '시작', '종료',
-          '이름', '연락처', '하고싶은이야기', '확인번호(암호화)', '동의시각', '상태', '매니저메모', '처리시각', '처리자', '캘린더ID'],
+          '이름', '연락처', '하고싶은이야기', '확인번호(암호화)', '동의시각', '상태', '매니저메모', '처리시각', '처리자', '캘린더ID', '이메일'],
   '처리기록': ['시각', '처리자', '구분', '대상ID', '내용'],
   '설정': ['항목', '값', '설명']
 };
@@ -44,6 +44,7 @@ var DEFAULT_SETTINGS = [
   ['개인정보보유기간', '커피챗 종료 후 6개월', '개인정보 동의 문구의 보유 기간'],
   ['신청받기', 'Y', 'N으로 바꾸면 전체 신청이 잠시 중단됩니다'],
   ['신청알림메일', 'Y', 'Y면 신청이 들어올 때 담당 매니저에게 메일을 보냅니다'],
+  ['신청자안내메일', 'Y', 'Y면 신청자에게 접수·확정·취소 안내 메일을 보냅니다'],
   ['운영자메일', '', '매니저 이메일이 비어 있을 때(예: 기타) 대신 받을 주소. 여러 명은 쉼표로 구분'],
   ['홈페이지주소', 'https://oneulmin-bot.github.io/connectoneul/', '알림 메일 속 관리자 페이지 링크에 쓰입니다'],
   ['캘린더ID', '', '확정된 커피챗을 등록할 구글 캘린더 주소(예: xxx@gmail.com). 비우면 등록하지 않음']
@@ -210,12 +211,14 @@ function publicManager_(m) {
 function apply_(b) {
   var name = cleanName_(b.name);
   var phone = cleanPhone_(b.phone);
+  var email = cleanEmail_(b.email);
   var pin = String(b.pin || '').trim();
   var message = String(b.message || '').trim().slice(0, 300);
   var slotId = String(b.slotId || '').trim();
 
   if (!name) return fail_('이름은 2~20자로 입력해 주세요.');
   if (!phone) return fail_('연락처를 010-0000-0000 형식으로 입력해 주세요.');
+  if (!email) return fail_('이메일 주소를 확인해 주세요. (예: name@example.com)');
   if (!/^\d{4}$/.test(pin)) return fail_('확인번호는 숫자 4자리로 입력해 주세요.');
   if (b.agree !== true) return fail_('개인정보 수집·이용에 동의해 주세요.');
   if (!slotId) return fail_('시간을 선택해 주세요.');
@@ -244,14 +247,14 @@ function apply_(b) {
       '매니저이름': str_(mRow['이름']), '날짜': slot.date, '시작': slot.start, '종료': slot.end,
       '이름': name, '연락처': phone, '하고싶은이야기': message,
       '확인번호(암호화)': pinHash_(phone, pin), '동의시각': now, '상태': '확인중',
-      '매니저메모': '', '처리시각': '', '처리자': ''
+      '매니저메모': '', '처리시각': '', '처리자': '', '이메일': email
     });
     setCell_(slotTable, row, '상태', SLOT_STATUS.HOLD);
     log_('신청자', '신청', appId, slot.date + ' ' + slot.start + ' / ' + str_(mRow['이름']));
 
     var mail = {
       to: str_(mRow['이메일']), managerName: str_(mRow['이름']), date: slot.date, start: slot.start, end: slot.end,
-      name: name, phone: phone, message: message, appId: appId
+      name: name, phone: phone, message: message, appId: appId, email: email
     };
   } finally {
     lock.releaseLock();
@@ -259,6 +262,7 @@ function apply_(b) {
 
   // 잠금을 푼 뒤 메일 발송 (메일이 실패해도 신청은 이미 저장됨)
   notifyManager_(mail, settings);
+  notifyApplicant_('접수', mail, settings);
   return ok_({ id: appId, managerName: mail.managerName, date: mail.date, start: mail.start, end: mail.end });
 }
 
@@ -307,6 +311,77 @@ function sendMail_(to, info, siteUrl) {
     body: info.managerName + ' 매니저님, 새 커피챗 신청: ' + when + ' / ' + info.name + ' / ' + info.phone + (admin !== 'admin.html' ? '\n관리자: ' + admin : ''),
     name: '사단법인 오늘은 커피챗'
   });
+}
+
+// ───────────────────────── 신청자 안내 메일 ─────────────────────────
+/** kind: '접수' | '확정' | '취소' */
+function notifyApplicant_(kind, info, settings) {
+  try {
+    if (!isYes_(settings['신청자안내메일'] || 'Y')) return;
+    var to = cleanEmail_(info.email);
+    if (!to) return;
+    sendApplicantMail_(kind, to, info, settings);
+    log_('시스템', '신청자메일', info.appId, kind + ' 안내');
+  } catch (e) {
+    console.error(e);
+    log_('시스템', '신청자메일실패', info.appId, kind + ': ' + String(e && e.message || e).slice(0, 180));
+  }
+}
+
+function sendApplicantMail_(kind, to, info, settings) {
+  var e = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+  var site = /^https:\/\//.test(settings['홈페이지주소'] || '') ? String(settings['홈페이지주소']).replace(/\/?$/, '/') : '';
+  var org = settings['운영주체'] || '사단법인 오늘은';
+  var when = info.date + ' ' + info.start + '–' + info.end;
+  var T = {
+    '접수': {
+      subject: '[오늘은 커피챗] 신청이 접수되었어요 · ' + when,
+      title: '커피챗 신청이 접수되었어요',
+      lead: info.managerName + ' 매니저가 신청 내용을 확인하고 있어요. 확정되거나 일정 조정이 필요하면 이 메일로 다시 알려드릴게요.',
+      button: '내 신청 확인하기'
+    },
+    '확정': {
+      subject: '[오늘은 커피챗] 커피챗이 확정되었어요 · ' + when,
+      title: '커피챗이 확정되었어요 ☕',
+      lead: info.managerName + ' 매니저와의 커피챗이 확정되었어요. 상세 장소 등은 매니저가 남겨주신 연락처로 직접 안내드릴 예정이에요.',
+      button: '내 신청 확인하기'
+    },
+    '취소': {
+      subject: '[오늘은 커피챗] 신청하신 커피챗이 진행되기 어려워요 · ' + when,
+      title: '이번 커피챗은 진행이 어려워요',
+      lead: '신청해 주셔서 감사합니다. 아쉽게도 매니저 사정으로 이 시간에는 커피챗을 진행하기 어려워졌어요. 다른 시간이나 다른 매니저로 다시 신청해 주시면 반갑게 만날게요.',
+      button: '다른 시간 보러 가기'
+    }
+  }[kind];
+  var link = site ? site + (kind === '취소' ? 'times.html' : '#my') : '';
+  var row = function (k, v) {
+    return '<tr><td style="padding:8px 12px;color:#555;white-space:nowrap;border-bottom:1px solid #eee">' + k +
+           '</td><td style="padding:8px 12px;border-bottom:1px solid #eee">' + v + '</td></tr>';
+  };
+  var html =
+    '<div style="font-family:Apple SD Gothic Neo,Malgun Gothic,sans-serif;max-width:520px;color:#000;line-height:1.6">' +
+    '<p style="font-size:13px;color:#1f65b8;font-weight:700;margin:0 0 4px">' + e(org) + ' 커피챗</p>' +
+    '<h2 style="font-size:20px;margin:0 0 10px">' + e(info.name) + '님, ' + e(T.title) + '</h2>' +
+    '<p style="font-size:14px;margin:0 0 14px">' + e(T.lead) + '</p>' +
+    '<table style="border-collapse:collapse;width:100%;font-size:14px;margin-bottom:16px">' +
+      row('일시', '<b>' + e(when) + '</b>') +
+      row('매니저', e(info.managerName) + ' 매니저') +
+      (kind !== '취소' ? row('장소', e(settings['장소안내'] || '')) : '') +
+      row('상태', '<b>' + ({ '접수': '매니저 확인중', '확정': '확정', '취소': '취소됨' }[kind]) + '</b>') +
+      row('신청번호', e(info.appId)) +
+    '</table>' +
+    (link ? '<p><a href="' + e(link) + '" style="display:inline-block;background:#1f65b8;color:#fff;text-decoration:none;padding:10px 18px;border-radius:999px;font-weight:700">' + e(T.button) + '</a></p>' : '') +
+    '<p style="font-size:12px;color:#777;margin-top:20px">진행 상황이 바뀌면 이 메일 주소로 안내드려요. ‘내 신청 확인’에서는 이름·연락처·확인번호로 확인할 수 있어요.<br>' +
+    '본 메일은 발신 전용입니다. · ' + e(org) + '</p></div>';
+  MailApp.sendEmail({
+    to: to, subject: T.subject, htmlBody: html, name: org + ' 커피챗',
+    body: info.name + '님, ' + T.title + '\n' + when + ' / ' + info.managerName + ' 매니저' + (link ? '\n' + link : '')
+  });
+}
+
+function cleanEmail_(v) {
+  var s = String(v || '').trim().slice(0, 100);
+  return /^[^@\s<>"',;]+@[^@\s<>"',;]+\.[^@\s<>"',;]+$/.test(s) ? s : '';
 }
 
 /** 쉼표로 구분된 주소 중 형식이 맞는 것만 남깁니다. 없으면 빈 문자열. */
@@ -404,7 +479,7 @@ function adminData_() {
         id: str_(r['신청ID']), appliedAt: str_(r['신청시각']), slotId: str_(r['슬롯ID']),
         managerId: str_(r['매니저ID']), managerName: str_(r['매니저이름']),
         date: date, start: start, end: cellTime_(r['종료']),
-        name: str_(r['이름']), phone: str_(r['연락처']), message: str_(r['하고싶은이야기']),
+        name: str_(r['이름']), phone: str_(r['연락처']), email: str_(r['이메일']), message: str_(r['하고싶은이야기']),
         status: str_(r['상태']) || '확인중', past: (date + ' ' + start) < now,
         memo: str_(r['매니저메모']), handledAt: str_(r['처리시각']), handledBy: str_(r['처리자'])
       };
@@ -455,13 +530,25 @@ function adminUpdateApp_(b, who) {
       setCell_(appTable, app, '처리자', who);
       log_(who, '상태변경', appId, before + ' → ' + status);
       var calendar = syncCalendar_(appTable, app, status, who);
+      // 신청자 메일: 확인중→확정, 확인중/확정→취소 일 때만 (되돌리기 등에는 보내지 않음)
+      var mailKind = (status === '확정' && before === '확인중') ||
+                     (status === '취소' && (before === '확인중' || before === '확정'));
+      if (mailKind && str_(app['이메일'])) {
+        var applicantMail = {
+          email: str_(app['이메일']), name: str_(app['이름']), managerName: str_(app['매니저이름']),
+          date: cellDate_(app['날짜']), start: cellTime_(app['시작']), end: cellTime_(app['종료']), appId: appId
+        };
+      }
     } else if (typeof b.memo === 'string') {
       log_(who, '메모', appId, '');
     }
-    return ok_({ calendar: calendar || '' });
+    var result = ok_({ calendar: calendar || '', mailed: applicantMail ? true : false });
   } finally {
     lock.releaseLock();
   }
+  // 잠금을 푼 뒤 신청자 안내 메일 (실패해도 상태 변경은 유지)
+  if (applicantMail) notifyApplicant_(status, applicantMail, getSettings_());
+  return result;
 }
 
 // ───────────────────────── 오늘은 캘린더 연동 ─────────────────────────

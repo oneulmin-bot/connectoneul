@@ -127,13 +127,14 @@
           var name = cleanName(p.name), phone = cleanPhone(p.phone);
           if (!name) return fail('이름은 2~20자로 입력해 주세요.');
           if (!phone) return fail('연락처를 010-0000-0000 형식으로 입력해 주세요.');
+          if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(p.email || '').trim())) return fail('이메일 주소를 확인해 주세요.');
           if (!/^\d{4}$/.test(p.pin || '')) return fail('확인번호는 숫자 4자리로 입력해 주세요.');
           if (p.agree !== true) return fail('개인정보 수집·이용에 동의해 주세요.');
           var slot = find(db.slots, p.slotId);
           if (!slot || slot.status !== '가능') return fail('방금 다른 분이 먼저 신청한 시간입니다. 다른 시간을 선택해 주세요.', 'SLOT_TAKEN');
           var m = find(db.managers, slot.managerId);
           var app = { id: 'A' + rid(6), appliedAt: now, slotId: slot.id, managerId: m.id, managerName: m.name, date: slot.date, start: slot.start, end: slot.end,
-                      name: name, phone: phone, message: String(p.message || '').slice(0, 300), pin: p.pin, status: '확인중', memo: '', handledAt: '', handledBy: '' };
+                      name: name, phone: phone, email: String(p.email).trim(), message: String(p.message || '').slice(0, 300), pin: p.pin, status: '확인중', memo: '', handledAt: '', handledBy: '' };
           db.apps.push(app); slot.status = '대기'; save(db);
           return ok({ id: app.id, managerName: m.name, date: slot.date, start: slot.start, end: slot.end });
         }
