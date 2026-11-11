@@ -31,7 +31,7 @@ var HEADERS = {
   '매니저': ['매니저ID', '이름', '한줄소개', '상세소개', '주제', '사진URL', '노출여부', '정렬순서', '이메일'],
   '가능시간': ['슬롯ID', '매니저ID', '날짜', '시작', '종료', '상태', '등록시각'],
   '신청': ['신청ID', '신청시각', '슬롯ID', '매니저ID', '매니저이름', '날짜', '시작', '종료',
-          '이름', '연락처', '하고싶은이야기', '확인번호(암호화)', '동의시각', '상태', '매니저메모', '처리시각', '처리자'],
+          '이름', '연락처', '하고싶은이야기', '확인번호(암호화)', '동의시각', '상태', '매니저메모', '처리시각', '처리자', '캘린더ID'],
   '처리기록': ['시각', '처리자', '구분', '대상ID', '내용'],
   '설정': ['항목', '값', '설명']
 };
@@ -45,7 +45,8 @@ var DEFAULT_SETTINGS = [
   ['신청받기', 'Y', 'N으로 바꾸면 전체 신청이 잠시 중단됩니다'],
   ['신청알림메일', 'Y', 'Y면 신청이 들어올 때 담당 매니저에게 메일을 보냅니다'],
   ['운영자메일', '', '매니저 이메일이 비어 있을 때(예: 기타) 대신 받을 주소. 여러 명은 쉼표로 구분'],
-  ['홈페이지주소', 'https://oneulmin-bot.github.io/connectoneul/', '알림 메일 속 관리자 페이지 링크에 쓰입니다']
+  ['홈페이지주소', 'https://oneulmin-bot.github.io/connectoneul/', '알림 메일 속 관리자 페이지 링크에 쓰입니다'],
+  ['캘린더ID', '', '확정된 커피챗을 등록할 구글 캘린더 주소(예: xxx@gmail.com). 비우면 등록하지 않음']
 ];
 
 // 신청 상태 / 슬롯 상태
@@ -59,6 +60,7 @@ function onOpen() {
     .addItem('1. 시트 자동 세팅', 'setupSheets')
     .addItem('2. 관리자 비밀번호 설정', 'setAdminPassword')
     .addItem('3. 알림 메일 테스트 (나에게 보내기)', 'testMail')
+    .addItem('4. 캘린더 연결 테스트', 'testCalendar')
     .addToUi();
 }
 
@@ -452,13 +454,80 @@ function adminUpdateApp_(b, who) {
       setCell_(appTable, app, '처리시각', nowStr_(true));
       setCell_(appTable, app, '처리자', who);
       log_(who, '상태변경', appId, before + ' → ' + status);
+      var calendar = syncCalendar_(appTable, app, status, who);
     } else if (typeof b.memo === 'string') {
       log_(who, '메모', appId, '');
     }
-    return ok_({});
+    return ok_({ calendar: calendar || '' });
   } finally {
     lock.releaseLock();
   }
+}
+
+// ───────────────────────── 오늘은 캘린더 연동 ─────────────────────────
+/**
+ * 확정 → 캘린더에 일정 추가 / 취소·확인중으로 되돌림 → 일정 삭제 / 종료 → 그대로 둠
+ * 반환: 'added' | 'removed' | 'failed' | 'off' | ''
+ * 캘린더가 공개라서 일정은 비공개로 넣고, 연락처는 넣지 않습니다.
+ */
+function syncCalendar_(appTable, app, status, who) {
+  var calId = str_(getSettings_()['캘린더ID']);
+  if (!calId) return 'off';
+  var appId = str_(app['신청ID']);
+  if (appTable.headers.indexOf('캘린더ID') < 0) {
+    log_('시스템', '캘린더생략', appId, "신청 탭에 '캘린더ID' 열이 없음 (시트 자동 세팅 다시 실행 필요)");
+    return 'failed';
+  }
+  var eventId = str_(app['캘린더ID']);
+  try {
+    var cal = CalendarApp.getCalendarById(calId);
+    if (!cal) throw new Error('캘린더를 찾을 수 없거나 권한이 없습니다: ' + calId);
+
+    if (status === '확정') {
+      if (eventId && cal.getEventById(eventId)) return '';   // 이미 등록됨 (종료 → 확정 되돌리기 등)
+      var date = cellDate_(app['날짜']), start = cellTime_(app['시작']), end = cellTime_(app['종료']);
+      var s = Utilities.parseDate(date + ' ' + start, TZ, 'yyyy-MM-dd HH:mm');
+      var e = Utilities.parseDate(date + ' ' + end, TZ, 'yyyy-MM-dd HH:mm');
+      var name = str_(app['이름']);
+      var ev = cal.createEvent('☕ 커피챗 · ' + str_(app['매니저이름']) + ' 매니저', s, e, {
+        location: str_(getSettings_()['장소안내']),
+        description: '신청자: ' + name + '\n신청번호: ' + appId + '\n확정: ' + who +
+                     '\n\n연락처 등 자세한 내용은 커피챗 관리자 페이지에서 확인하세요.'
+      });
+      try { ev.setVisibility(CalendarApp.Visibility.PRIVATE); } catch (x) { console.error(x); }
+      setCell_(appTable, app, '캘린더ID', ev.getId());
+      log_('시스템', '캘린더등록', appId, date + ' ' + start);
+      return 'added';
+    }
+    if ((status === '취소' || status === '확인중') && eventId) {
+      var old = cal.getEventById(eventId);
+      if (old) old.deleteEvent();
+      setCell_(appTable, app, '캘린더ID', '');
+      log_('시스템', '캘린더삭제', appId, '');
+      return 'removed';
+    }
+    return '';
+  } catch (err) {
+    console.error(err);
+    log_('시스템', '캘린더실패', appId, String(err && err.message || err).slice(0, 200));
+    return 'failed';
+  }
+}
+
+/** 시트 메뉴: 캘린더 권한을 승인하고, 테스트 일정을 만들었다가 바로 지웁니다. */
+function testCalendar() {
+  var calId = str_(getSettings_()['캘린더ID']);
+  if (!calId) { safeAlert_("설정 탭의 '캘린더ID' 값에 오늘은 캘린더 주소(예: xxx@gmail.com)를 먼저 넣어 주세요."); return; }
+  var cal = CalendarApp.getCalendarById(calId);
+  if (!cal) {
+    safeAlert_('캘린더에 접근할 수 없습니다: ' + calId + '\n\n캘린더 주인 계정에서 이 스크립트 계정(' +
+      Session.getEffectiveUser().getEmail() + ')에 [일정 변경] 권한으로 공유해 주세요.');
+    return;
+  }
+  var now = new Date();
+  var ev = cal.createEvent('커피챗 연결 테스트 (곧 삭제됨)', now, new Date(now.getTime() + 30 * 60000));
+  ev.deleteEvent();
+  safeAlert_('캘린더 연결 성공: ' + cal.getName() + '\n이제 매니저가 [확정하기]를 누르면 이 캘린더에 일정이 등록됩니다.');
 }
 
 function adminAddSlots_(b, who) {

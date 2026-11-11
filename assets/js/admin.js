@@ -153,7 +153,14 @@
     }
     U.setBusy(b, true, '');
     adminCall('adminUpdateApp', payload)
-      .then(function () { U.toast(payload.status ? '‘' + payload.status + '’ 상태로 바꿨어요.' : '메모를 저장했어요.', 'success'); return refresh(); })
+      .then(function (r) {
+        var msg = payload.status ? '‘' + payload.status + '’ 상태로 바꿨어요.' : '메모를 저장했어요.';
+        if (r && r.calendar === 'added') msg += ' 오늘은 캘린더에 등록했어요.';
+        if (r && r.calendar === 'removed') msg += ' 캘린더 일정도 지웠어요.';
+        if (r && r.calendar === 'failed') U.toast(msg + ' 단, 캘린더 등록에 실패했어요. 처리기록 탭을 확인해 주세요.', 'error');
+        else U.toast(msg, 'success');
+        return refresh();
+      })
       .catch(function (err) { U.toast(err.message, 'error'); U.setBusy(b, false); });
   });
 
