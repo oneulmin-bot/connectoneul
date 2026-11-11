@@ -191,29 +191,36 @@
       .then(function () { U.setBusy(btn, false); });
   });
 
+  var showDeleted = false;
   function renderSlots() {
     var mid = $('#slotManager').value;
     var today = new Date(); var pad = function (n) { return ('0' + n).slice(-2); };
     var todayStr = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
-    var list = data.slots.filter(function (s) { return s.managerId === mid && s.date >= todayStr; });
-    if (!list.length) { $('#slotList').innerHTML = '<div class="state"><b>등록된 시간이 없어요</b>위에서 시간을 추가해 주세요.</div>'; return; }
+    var all = data.slots.filter(function (s) { return s.managerId === mid && s.date >= todayStr; });
+    var deleted = all.filter(function (s) { return s.status === '닫힘'; }).length;
+    var list = showDeleted ? all : all.filter(function (s) { return s.status !== '닫힘'; });
+    var toggle = deleted ? '<button type="button" class="link-btn slot-toggle" data-toggle-deleted>' +
+      (showDeleted ? '삭제한 시간 숨기기' : '삭제한 시간 ' + deleted + '개 보기') + '</button>' : '';
+    if (!list.length) { $('#slotList').innerHTML = '<div class="state"><b>등록된 시간이 없어요</b>위에서 시간을 추가해 주세요.</div>' + toggle; return; }
     var g = {};
     list.forEach(function (s) { (g[s.date] = g[s.date] || []).push(s); });
-    var LABEL = { '가능': '', '대기': '<small>신청됨</small>', '확정': '<small>확정</small>', '닫힘': '' };
+    var LABEL = { '가능': '', '대기': '<small>신청됨</small>', '확정': '<small>확정</small>', '닫힘': '<small>삭제됨</small>' };
     $('#slotList').innerHTML = Object.keys(g).sort().map(function (d) {
       return '<div class="slot-day"><h3>' + esc(U.fmtDate(d)) + '</h3><div class="slot-chips">' + g[d].map(function (s) {
-        var act = s.status === '가능' ? '<button data-slot="' + esc(s.id) + '" data-to="닫힘">닫기</button>'
-                : s.status === '닫힘' ? '<button data-slot="' + esc(s.id) + '" data-to="가능">열기</button>' : '';
+        var act = s.status === '가능' ? '<button data-slot="' + esc(s.id) + '" data-to="닫힘" aria-label="' + esc(s.start) + ' 삭제">삭제</button>'
+                : s.status === '닫힘' ? '<button data-slot="' + esc(s.id) + '" data-to="가능">되살리기</button>' : '';
         return '<span class="slot-chip s-' + esc(s.status) + '">' + esc(s.start) + ' ' + (LABEL[s.status] || '') + act + '</span>';
       }).join('') + '</div></div>';
-    }).join('');
+    }).join('') + toggle;
   }
 
   $('#slotList').addEventListener('click', function (e) {
+    if (e.target.closest('[data-toggle-deleted]')) { showDeleted = !showDeleted; renderSlots(); return; }
     var b = e.target.closest('button[data-slot]'); if (!b) return;
+    var to = b.getAttribute('data-to');
     b.disabled = true;
-    adminCall('adminSetSlot', { slotId: b.getAttribute('data-slot'), status: b.getAttribute('data-to') })
-      .then(function () { return refresh(); })
+    adminCall('adminSetSlot', { slotId: b.getAttribute('data-slot'), status: to })
+      .then(function () { U.toast(to === '닫힘' ? '시간을 삭제했어요. 홈페이지에서도 사라져요.' : '시간을 되살렸어요.', 'success'); return refresh(); })
       .catch(function (err) { U.toast(err.message, 'error'); b.disabled = false; });
   });
 
