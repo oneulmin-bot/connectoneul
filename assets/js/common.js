@@ -127,13 +127,28 @@
     document.body.prepend(b);
   }
 
+  /** 카카오톡 채널 문의 버튼: 주소가 있으면 링크, 없으면 '검색해 주세요' 안내 */
+  function applyKakao(url) {
+    var org = (window.APP_CONFIG || {}).ORG_NAME || '사단법인 오늘은';
+    $all('[data-kakao]').forEach(function (a) {
+      if (url && /^https:\/\//.test(url)) { a.href = url; a.classList.remove('no-link'); }
+      else {
+        a.removeAttribute('href'); a.classList.add('no-link');
+        a.querySelector('span').textContent = '문의 · 카카오톡에서 ‘' + org + '’ 채널을 검색해 주세요';
+      }
+    });
+  }
+
   function applySettings(s) {
     if (!s) return;
+    applyKakao(s.kakao || (window.APP_CONFIG || {}).KAKAO_URL);
     $all('[data-setting]').forEach(function (el) {
       var v = s[el.getAttribute('data-setting')];
       if (v) el.textContent = v;
     });
   }
+
+  applyKakao((window.APP_CONFIG || {}).KAKAO_URL);  // 서버 응답 전 기본값
 
   window.U = {
     $: $, $all: $all, esc: esc, fmtDate: fmtDate, dateParts: dateParts,

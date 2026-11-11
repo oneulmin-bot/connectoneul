@@ -14,5 +14,8 @@ window.APP_CONFIG = {
   ORG_NAME: '사단법인 오늘은',
 
   // 상단 메뉴 '사단법인 오늘은'을 누르면 이동할 홈페이지 주소
-  ORG_URL: 'https://oneul.or.kr'
+  ORG_URL: 'https://oneul.or.kr',
+
+  // 문의용 카카오톡 채널 주소 (시트 설정 탭 '문의카카오'가 우선). 예: 'https://pf.kakao.com/_xxxx'
+  KAKAO_URL: ''
 };

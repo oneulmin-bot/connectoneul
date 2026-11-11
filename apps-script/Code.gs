@@ -47,6 +47,7 @@ var DEFAULT_SETTINGS = [
   ['신청자안내메일', 'Y', 'Y면 신청자에게 접수·확정·취소 안내 메일을 보냅니다'],
   ['운영자메일', '', '매니저 이메일이 비어 있을 때(예: 기타) 대신 받을 주소. 여러 명은 쉼표로 구분'],
   ['홈페이지주소', 'https://oneulmin-bot.github.io/connectoneul/', '알림 메일 속 관리자 페이지 링크에 쓰입니다'],
+  ['문의카카오', '', '카카오톡 채널 주소(예: https://pf.kakao.com/_xxxx). 홈페이지·안내 메일의 문의 버튼에 쓰입니다'],
   ['캘린더ID', '', '확정된 커피챗을 등록할 구글 캘린더 주소(예: xxx@gmail.com). 비우면 등록하지 않음']
 ];
 
@@ -188,6 +189,7 @@ function getPublicData_() {
       doneMessage: settings['완료안내'] || '',
       retention: settings['개인정보보유기간'] || '',
       open: isYes_(settings['신청받기'] || 'Y'),
+      kakao: safeUrl_(settings['문의카카오']),
       slotMinutes: SLOT_MINUTES
     },
     managers: managers,
@@ -332,6 +334,7 @@ function sendApplicantMail_(kind, to, info, settings) {
   var e = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
   var site = /^https:\/\//.test(settings['홈페이지주소'] || '') ? String(settings['홈페이지주소']).replace(/\/?$/, '/') : '';
   var org = settings['운영주체'] || '사단법인 오늘은';
+  var kakao = safeUrl_(settings['문의카카오']);
   var when = info.date + ' ' + info.start + '–' + info.end;
   var T = {
     '접수': {
@@ -371,11 +374,16 @@ function sendApplicantMail_(kind, to, info, settings) {
       row('신청번호', e(info.appId)) +
     '</table>' +
     (link ? '<p><a href="' + e(link) + '" style="display:inline-block;background:#1f65b8;color:#fff;text-decoration:none;padding:10px 18px;border-radius:999px;font-weight:700">' + e(T.button) + '</a></p>' : '') +
-    '<p style="font-size:12px;color:#777;margin-top:20px">진행 상황이 바뀌면 이 메일 주소로 안내드려요. ‘내 신청 확인’에서는 이름·연락처·확인번호로 확인할 수 있어요.<br>' +
-    '본 메일은 발신 전용입니다. · ' + e(org) + '</p></div>';
+    '<div style="margin-top:20px;padding:12px 14px;background:#fef9d8;border-radius:12px;font-size:13px">' +
+      '<b>문의는 카카오톡 채널 ‘' + e(org) + '’에 남겨 주세요.</b><br>' +
+      (kakao ? '<a href="' + e(kakao) + '" style="color:#000;font-weight:700">카카오톡 채널 바로가기 →</a>'
+             : '카카오톡에서 ‘' + e(org) + '’ 채널을 검색해 추가해 주세요.') +
+      '<br><span style="color:#777">이 메일은 발신 전용이라 답장하셔도 확인이 어려워요.</span></div>' +
+    '<p style="font-size:12px;color:#777;margin-top:14px">진행 상황이 바뀌면 이 메일 주소로 안내드려요. ‘내 신청 확인’에서는 이름·연락처·확인번호로 확인할 수 있어요. · ' + e(org) + '</p></div>';
   MailApp.sendEmail({
     to: to, subject: T.subject, htmlBody: html, name: org + ' 커피챗',
-    body: info.name + '님, ' + T.title + '\n' + when + ' / ' + info.managerName + ' 매니저' + (link ? '\n' + link : '')
+    body: info.name + '님, ' + T.title + '\n' + when + ' / ' + info.managerName + ' 매니저' + (link ? '\n' + link : '') +
+          '\n\n문의: 카카오톡 채널 ‘' + org + '’' + (kakao ? ' ' + kakao : '') + ' (이 메일은 발신 전용입니다)'
   });
 }
 

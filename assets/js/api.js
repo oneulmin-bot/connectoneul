@@ -105,6 +105,7 @@
       doneMessage: '신청이 접수되었습니다. 매니저가 확인한 뒤 남겨주신 연락처로 확정 연락을 드립니다.',
       retention: '커피챗 종료 후 6개월',
       open: true,
+      kakao: '',
       slotMinutes: SLOT_MIN
     };
 
