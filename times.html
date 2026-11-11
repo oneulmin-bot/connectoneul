@@ -9,18 +9,19 @@
   <link rel="icon" type="image/png" href="assets/img/symbol.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUITE/fonts/static/woff2/SUITE.css">
-  <link rel="stylesheet" href="assets/css/style.css?v=20261111d">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261111e">
 </head>
 <body>
 
   <main class="wrap narrow">
     <div class="page-head">
       <h1>전체 타임 보기</h1>
-      <p>원하는 시간의 매니저를 누르면 바로 신청할 수 있어요.</p>
+      <p>날짜를 고르고, 원하는 시간의 매니저를 누르면 바로 신청할 수 있어요.</p>
     </div>
 
     <div class="filters filters-scroll" id="managerFilter" role="group" aria-label="매니저 선택"></div>
-    <div id="timeline" aria-live="polite"><div class="skeleton"></div></div>
+    <section class="cal card" id="calendar" aria-label="날짜 선택"><div class="skeleton" style="min-height:300px"></div></section>
+    <div id="dayList" aria-live="polite"></div>
   </main>
 
   <footer><img src="assets/img/symbol.png" alt="" width="28" height="27"><div>운영 · <span data-setting="orgName">사단법인 오늘은</span></div><div class="en-label">TODAY TO TOMORROW</div></footer>
@@ -32,9 +33,9 @@
     <a href="https://oneul.or.kr" data-nav="org" target="_blank" rel="noopener"><span class="tb-ic"><img src="assets/img/symbol.png" alt="" width="22" height="22"></span><span class="tb-tx">오늘은</span></a>
   </nav>
 
-  <script src="assets/js/config.js?v=20261111d"></script>
-  <script src="assets/js/api.js?v=20261111d"></script>
-  <script src="assets/js/common.js?v=20261111d"></script>
-  <script src="assets/js/times.js?v=20261111d"></script>
+  <script src="assets/js/config.js?v=20261111e"></script>
+  <script src="assets/js/api.js?v=20261111e"></script>
+  <script src="assets/js/common.js?v=20261111e"></script>
+  <script src="assets/js/times.js?v=20261111e"></script>
 </body>
 </html>
