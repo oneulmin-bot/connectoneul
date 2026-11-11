@@ -154,7 +154,7 @@
         case 'adminData':
           if (!auth(db, p)) return fail('로그인이 만료되었습니다. 다시 로그인해 주세요.', 'AUTH');
           return ok({
-            managers: db.managers.slice().sort(function (a, b) { return a.order - b.order; }),
+            managers: db.managers.map(function (m) { return Object.assign({ email: '' }, m); }).sort(function (a, b) { return a.order - b.order; }),
             slots: db.slots.slice().sort(function (a, b) { return (a.date + a.start).localeCompare(b.date + b.start); }),
             apps: db.apps.map(function (a) { var c = Object.assign({}, a); delete c.pin; c.past = (a.date + ' ' + a.start) < now; return c; })
               .sort(function (a, b) { return b.appliedAt.localeCompare(a.appliedAt); }),

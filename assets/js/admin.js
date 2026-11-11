@@ -224,6 +224,10 @@
     $('#pfName').value = m.name; $('#pfOne').value = m.oneLine; $('#pfDetail').value = m.detail;
     $('#pfTopics').value = (m.topics || []).join(', '); $('#pfPhoto').value = m.photo || ''; $('#pfEmail').value = m.email || '';
     $('#pfOrder').value = m.order === 999 ? '' : m.order; $('#pfVisible').checked = !!m.visible;
+    // 서버(Apps Script)가 예전 버전이면 이메일 항목 자체가 오지 않음 → 안내
+    var old = data.managers.length && !('email' in data.managers[0]);
+    $('#pfEmailWarn').hidden = !old;
+    $('#pfEmail').disabled = old;
   }
   $('#pfSelect').addEventListener('change', fillProfile);
 
@@ -240,7 +244,18 @@
     var btn = $('#pfSaveBtn');
     U.setBusy(btn, true, '저장 중');
     adminCall('adminSaveManager', { manager: manager })
-      .then(function (r) { U.toast('저장했어요.', 'success'); $('#pfSelect').value = r.id; return refresh().then(function () { $('#pfSelect').value = r.id; fillProfile(); }); })
+      .then(function (r) {
+        $('#pfSelect').value = r.id;
+        return refresh().then(function () {
+          $('#pfSelect').value = r.id; fillProfile();
+          var saved = data.managers.filter(function (x) { return x.id === r.id; })[0] || {};
+          if (manager.email && saved.email !== manager.email) {
+            U.toast('소개는 저장됐지만 이메일은 저장되지 않았어요. Apps Script를 새 버전으로 배포해 주세요.', 'error');
+          } else {
+            U.toast('저장했어요.', 'success');
+          }
+        });
+      })
       .catch(function (err) { U.toast(err.message, 'error'); })
       .then(function () { U.setBusy(btn, false); });
   });

@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" href="assets/img/symbol.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUITE/fonts/static/woff2/SUITE.css">
-  <link rel="stylesheet" href="assets/css/style.css?v=20261111c">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261111d">
 </head>
 <body>
 
@@ -109,7 +109,7 @@
             <div class="field"><label for="pfDetail">상세 소개 <span class="opt">(선택)</span></label><textarea class="input" id="pfDetail" maxlength="1000" placeholder="어떤 이야기를 나눌 수 있는지 소개해 주세요."></textarea></div>
             <div class="field"><label for="pfTopics">커피챗 주제</label><input class="input" id="pfTopics" placeholder="쉼표로 구분: 진로, 기획, 창업"><p class="field-help">최대 8개</p></div>
             <div class="field"><label for="pfPhoto">사진 주소 <span class="opt">(선택)</span></label><input class="input" id="pfPhoto" placeholder="https://..."><p class="field-help">https:// 로 시작하는 이미지 주소. 비우면 이름 첫 글자가 표시돼요.</p></div>
-            <div class="field"><label for="pfEmail">알림 받을 이메일</label><input class="input" id="pfEmail" type="email" inputmode="email" placeholder="name@oneul.or.kr"><p class="field-help">새 신청이 들어오면 이 주소로 알림 메일이 가요. 홈페이지에는 보이지 않아요.</p></div>
+            <div class="field"><label for="pfEmail">알림 받을 이메일</label><input class="input" id="pfEmail" type="email" inputmode="email" placeholder="name@oneul.or.kr"><p class="field-help">새 신청이 들어오면 이 주소로 알림 메일이 가요. 홈페이지에는 보이지 않아요.</p><p class="field-error" id="pfEmailWarn" hidden>지금 연결된 Apps Script가 예전 버전이라 이메일을 저장할 수 없어요. 최신 Code.gs를 붙여넣고 <b>배포 관리 → 새 버전</b>으로 다시 배포한 뒤, 시트 메뉴에서 <b>1. 시트 자동 세팅</b>을 한 번 더 실행해 주세요.</p></div>
             <div class="row-2">
               <div class="field"><label for="pfOrder">표시 순서</label><input class="input" id="pfOrder" type="number" min="1" max="999"></div>
               <div class="field"><label>&nbsp;</label><label class="switch"><input type="checkbox" id="pfVisible"> 홈페이지에 노출</label></div>
@@ -121,9 +121,9 @@
     </section>
   </main>
 
-  <script src="assets/js/config.js?v=20261111c"></script>
-  <script src="assets/js/api.js?v=20261111c"></script>
-  <script src="assets/js/common.js?v=20261111c"></script>
-  <script src="assets/js/admin.js?v=20261111c"></script>
+  <script src="assets/js/config.js?v=20261111d"></script>
+  <script src="assets/js/api.js?v=20261111d"></script>
+  <script src="assets/js/common.js?v=20261111d"></script>
+  <script src="assets/js/admin.js?v=20261111d"></script>
 </body>
 </html>
